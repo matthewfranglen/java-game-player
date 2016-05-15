@@ -2,12 +2,12 @@ package TicTacToe;
 
 public class WinChecker {
 
-    public boolean isAWinForPlayer(Board board) {
-        return isAWin(board, Run.getPlayer());
+    public boolean isAWinForPlayer(Board board, String player) {
+        return isAWin(board, player);
     }
 
-    public boolean isAWinForOpponent(Board board) {
-        return isAWin(board, Run.getOpponent());
+    public boolean isAWinForOpponent(Board board, String opponent) {
+        return isAWin(board, opponent);
     }
 
     private boolean isAWin(Board board, String player) {

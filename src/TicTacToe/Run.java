@@ -8,33 +8,21 @@ public class Run {
 
     private static WinChecker winChecker = new WinChecker();
     private static TieChecker tieChecker = new TieChecker();
-    private static boolean gameWon = false;
-    private static boolean isATie = false;
-    private static String opponent;
-    private static String player;
-    private static int difficultyLevel;
-
-    public static String getPlayer() {
-        return player;
-    }
-
-    public static String getOpponent() {
-        return opponent;
-    }
 
     public static void main(String[] args) throws IOException {
+        Game game = new Game();
         Board board = new Board();
         board.createNewBoard();
 
         System.out.println("Welcome to Tic-Tac-Toe. Would you like to be X or O?");
-        opponent = getOpponentPieceChoice();
-        player = (opponent.equals("[O]") ? "[X]" : "[O]");
+        game.setOpponent(getOpponentPieceChoice());
+        game.setPlayer(game.getOpponent().equals("[O]") ? "[X]" : "[O]");
         System.out.println("Would you like to go first? Y/N");
         boolean opponentStarts = isOpponentStarter();
         System.out.println("Lastly, what difficulty level? Easy (E) or Impossible to Win (I)?");
-        difficultyLevel = getDepth();
+        game.setDifficultyLevel(getDepth());
         board.printBoard();
-        playGame(opponentStarts, board);
+        playGame(opponentStarts, board, game);
     }
 
     private static String getOpponentPieceChoice() throws IOException {
@@ -74,48 +62,48 @@ public class Run {
         return 10;
     }
 
-    private static void playGame(boolean opponentStarts, Board board) throws IOException {
+    private static void playGame(boolean opponentStarts, Board board, Game game) throws IOException {
         if (opponentStarts) {
             do {
-                getMove(board);
-                gameWon = winChecker.isAWinForOpponent(board);
-                isATie = tieChecker.isATie(board);
-                if (gameWon || isATie) {
+                getMove(board, game);
+                game.setIsWon(winChecker.isAWinForOpponent(board, game.getOpponent()));
+                game.setIsATie(tieChecker.isATie(board));
+                if (game.isATie() || game.isWon()) {
                     break;
                 }
-                makeBestMove(board);
-                gameWon = winChecker.isAWinForPlayer(board);
-                isATie = tieChecker.isATie(board);
-                if (gameWon || isATie) {
+                makeBestMove(board, game);
+                game.setIsWon(winChecker.isAWinForPlayer(board, game.getPlayer()));
+                game.setIsATie(tieChecker.isATie(board));
+                if (game.isATie() || game.isWon()) {
                     break;
                 }
-            } while (!gameWon && !isATie);
+            } while (!game.isATie() && !game.isWon());
         } else {
             do {
-                makeBestMove(board);
-                gameWon = winChecker.isAWinForPlayer(board);
-                isATie = tieChecker.isATie(board);
-                if (gameWon || isATie) {
+                makeBestMove(board, game);
+                game.setIsWon(winChecker.isAWinForPlayer(board, game.getPlayer()));
+                game.setIsATie(tieChecker.isATie(board));
+                if (game.isATie() || game.isWon()) {
                     break;
                 }
-                getMove(board);
-                gameWon = winChecker.isAWinForOpponent(board);
-                isATie = tieChecker.isATie(board);
-                if (gameWon || isATie) {
+                getMove(board, game);
+                game.setIsWon(winChecker.isAWinForOpponent(board, game.getOpponent()));
+                game.setIsATie(tieChecker.isATie(board));
+                if (game.isATie() || game.isWon()) {
                     break;
                 }
-            } while (!gameWon && !isATie);
+            } while (!game.isATie() && !game.isWon());
         }
-        if (winChecker.isAWinForOpponent(board)) {
+        if (winChecker.isAWinForOpponent(board, game.getOpponent())) {
             System.out.println("YOU WIN!");
-        } else if (winChecker.isAWinForPlayer(board)) {
+        } else if (winChecker.isAWinForPlayer(board, game.getPlayer())) {
             System.out.println("YOU LOSE!");
         } else {
             System.out.println("IT'S A TIE");
         }
     }
 
-    private static void getMove(Board board) throws IOException {
+    private static void getMove(Board board, Game game) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         System.out.print("Enter Position as row|number " +
                 "(eg the first cell is 00, the one to it's right is 01, the one below it is 10: ");
@@ -126,30 +114,30 @@ public class Run {
             Cell[][] currentBoard = board.getBoard();
             if (!currentBoard[i][j].getCell().equals("[ ]")) {
                 System.out.println("Already a piece there. Try again\n");
-                getMove(board);
+                getMove(board, game);
             } else {
-                currentBoard[i][j].setCell(opponent);
+                currentBoard[i][j].setCell(game.getOpponent());
                 board.setBoard(currentBoard);
                 board.printBoard();
             }
         } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
             System.out.println("That is not a valid location. Try again\n");
-            getMove(board);
+            getMove(board, game);
         }
     }
 
-    private static void makeBestMove(Board board) {
+    private static void makeBestMove(Board board, Game game) {
         System.out.println("AI's move:");
         AIPlayer aiPlayer = new AIPlayer();
-        int[] bla = aiPlayer.miniMax(board, difficultyLevel, player);
+        int[] bla = aiPlayer.miniMax(board, game.getDifficultyLevel(), game.getPlayer(), game);
         int i = bla[1];
         int j = bla[2];
 
         Cell[][] currentBoard = board.getBoard();
         if (!currentBoard[i][j].getCell().equals("[ ]")) {
-            makeBestMove(board);
+            makeBestMove(board, game);
         } else {
-            currentBoard[i][j].setCell(player);
+            currentBoard[i][j].setCell(game.getPlayer());
             board.setBoard(currentBoard);
             board.printBoard();
         }

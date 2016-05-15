@@ -8,30 +8,30 @@ public class AIPlayer {
     private static WinChecker winChecker = new WinChecker();
     private static TieChecker tieChecker = new TieChecker();
 
-    public int[] miniMax(Board board, int depth, String player) {
+    public int[] miniMax(Board board, int depth, String player, Game game) {
         Cell[][] cells = board.getBoard().clone();
         List<int[]> possibleMoves = getEmptySlots(board);
-        int bestScore = player.equals(Run.getPlayer()) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+        int bestScore = player.equals(game.getPlayer()) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         int currentScore;
         int bestRow = -1;
         int bestCol = -1;
-        if (winChecker.isAWinForPlayer(board)
-                || winChecker.isAWinForOpponent(board)
+        if (winChecker.isAWinForPlayer(board, game.getPlayer())
+                || winChecker.isAWinForOpponent(board, game.getOpponent())
                 || tieChecker.isATie(board)
                 || depth == 0) {
-            bestScore = getScore(board);
+            bestScore = getScore(board, game);
         } else {
             for (int[] move : possibleMoves) {
                 cells[move[0]][move[1]].setCell(player);
-                if (player.equals(Run.getPlayer())) {
-                    currentScore = miniMax(board, depth - 1, Run.getOpponent())[0];
+                if (player.equals(game.getPlayer())) {
+                    currentScore = miniMax(board, depth - 1, game.getOpponent(), game)[0];
                     if (currentScore > bestScore) {
                         bestScore = currentScore;
                         bestRow = move[0];
                         bestCol = move[1];
                     }
                 } else {
-                    currentScore = miniMax(board, depth - 1, Run.getPlayer())[0];
+                    currentScore = miniMax(board, depth - 1, game.getPlayer(), game)[0];
                     if (currentScore < bestScore) {
                         bestScore = currentScore;
                         bestRow = move[0];
@@ -44,11 +44,11 @@ public class AIPlayer {
         return new int [] {bestScore, bestRow, bestCol};
     }
 
-    public static int getScore(Board board) {
+    private static int getScore(Board board, Game game) {
         int score = 0;
-        if (winChecker.isAWinForPlayer(board)) {
+        if (winChecker.isAWinForPlayer(board, game.getPlayer())) {
             score = 100;
-        } else if (winChecker.isAWinForOpponent(board)) {
+        } else if (winChecker.isAWinForOpponent(board, game.getOpponent())) {
             score = -100;
         } else if (tieChecker.isATie(board)) {
             score = 0;

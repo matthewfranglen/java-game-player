@@ -29,6 +29,9 @@ public class Board {
     }
 
     public Tile at(int row, int column) {
+        checkArgument(row >= 0 && row < ROWS, "Row out of range");
+        checkArgument(column >= 0 && column < COLUMNS, "Column out of range");
+
         return tiles.get(toIndex(row, column));
     }
 

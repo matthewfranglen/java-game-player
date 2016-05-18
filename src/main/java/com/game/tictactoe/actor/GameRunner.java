@@ -30,6 +30,7 @@ public class GameRunner {
 
         while (game.isNotOver()) {
             mover.move(game);
+            System.out.println(game);
         }
 
         if (game.isWon()) {

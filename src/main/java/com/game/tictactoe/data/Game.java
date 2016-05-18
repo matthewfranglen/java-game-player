@@ -53,11 +53,15 @@ public class Game {
     }
 
     public boolean isOver() {
-        return board.isFull();
+        return board.isFull() || isWon() || isLost();
     }
 
     public boolean isNotOver() {
         return ! isOver();
+    }
+
+    public String toString() {
+        return board.toString();
     }
 
 }

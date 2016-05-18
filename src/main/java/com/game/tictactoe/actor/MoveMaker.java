@@ -26,16 +26,17 @@ public class MoveMaker {
                 column = Integer.parseInt(position.substring(1, 2));
             }
             catch (NumberFormatException e) {
-                System.err.println("That is not a valid location. Try again\n");
+                System.err.println("That is not a valid location. Try again");
                 continue;
             }
 
             if (! game.canMove(row, column)) {
-                System.err.println("Already a piece there. Try again\n");
+                System.err.println("Already a piece there. Try again");
                 continue;
             }
 
             game.move(row, column);
+            return;
         }
     }
 

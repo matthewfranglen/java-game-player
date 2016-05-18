@@ -67,7 +67,7 @@ public class Board {
     public List<Tile> diagonalUp() {
         int range = Math.min(ROWS, COLUMNS);
         return IntStream.range(0, range)
-            .mapToObj(i -> at(i, range - i))
+            .mapToObj(i -> at(i, (range - 1) - i))
             .collect(Collectors.toList());
     }
 
